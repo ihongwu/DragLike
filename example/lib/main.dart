@@ -76,6 +76,9 @@ class _MyAppState extends State<MyApp> {
                     }
                     setState(() {});
                   },
+                  onPointerUp: (){
+                    
+                  },
                 ),
               ],
             )
