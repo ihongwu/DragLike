@@ -77,7 +77,6 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin{
         double distanceProgress = distance / widget.outValue;
         widget.onChangeDragDistance({'distance':distance,'distanceProgress':distanceProgress.abs()});
       }
-      print(angle);
       setState(() {});
     }
   }
