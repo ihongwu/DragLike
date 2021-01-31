@@ -1,0 +1,22 @@
+PODS:
+  - drag_like (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - drag_like (from `.symlinks/plugins/drag_like/ios`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  drag_like:
+    :path: ".symlinks/plugins/drag_like/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  drag_like: 9a045b3827a88ddcde9c4d4727cb78922a1fdcde
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.9.1
