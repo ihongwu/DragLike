@@ -16,6 +16,39 @@ dependencies:
 ## 效果图
 <img src="https://raw.githubusercontent.com/ihongwu/drag_like/main/gif.gif" width="400">
 
+## 使用方法
+```
+DragLike(
+  child: imagelist.length <=0 ? Text('加载中...') : ClipRRect(
+    borderRadius: BorderRadius.circular(10),
+    child: TestDrag(src:imagelist[0])
+  ), 
+  secondChild: imagelist.length <= 1 ? Container(): ClipRRect(
+    borderRadius: BorderRadius.circular(10),
+    child:TestDrag(src:imagelist[1])
+  ), 
+  screenWidth: 375, 
+  outValue: 0.6,
+  onChangeDragDistance: (distance){
+    /// {distance: 0.17511112467447917, distanceProgress: 0.2918518744574653}
+    print(distance.toString());
+  },
+  onOutComplete: (type){
+    /// left or right
+    print(type);
+  },
+  onScaleComplete: (){
+    imagelist.remove(imagelist[0]);
+    if(imagelist.length == 0) {
+      loaddata();
+    }
+    setState(() {});
+  },
+  onPointerUp: (){
+    
+  },
+),
+```
 
 ## 回调方法
 ### onOutComplete
