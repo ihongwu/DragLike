@@ -21,7 +21,7 @@ dependencies:
   drag_like: ^last version
 ```
 ## 效果图
-<img src="https://raw.githubusercontent.com/ihongwu/drag_like/main/drag_like.gif" width="400">
+<img src="https://raw.githubusercontent.com/ihongwu/DragLike/main/drag_like.gif" width="400">
 
 ## 使用方法
 ```
