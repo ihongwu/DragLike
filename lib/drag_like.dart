@@ -164,7 +164,9 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin{
                  runBackAnimate();
                }
                // 手指抬起时，回调给上层
-               widget.onPointerUp();
+               if(widget.onPointerUp != null) {
+                 widget.onPointerUp();
+               }
              },
              child: Transform.rotate(
               angle: angle,
