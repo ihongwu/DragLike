@@ -11,7 +11,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   List data = [
     'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn.sinaimg.cn%2Fsinacn20%2F170%2Fw1024h1546%2F20180318%2Fa00d-fyshfur3814572.jpg&refer=http%3A%2F%2Fn.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1613903060&t=651082a2ee0be03315c114381adaea8dhttps://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn.sinaimg.cn%2Fsinacn20%2F170%2Fw1024h1546%2F20180318%2Fa00d-fyshfur3814572.jpg&refer=http%3A%2F%2Fn.sinaimg.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1613903060&t=651082a2ee0be03315c114381adaea8d',
     'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fn1.itc.cn%2Fimg8%2Fwb%2Frecom%2F2016%2F05%2F19%2F146364216575228138.JPEG&refer=http%3A%2F%2Fn1.itc.cn&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1614001788&t=3727c8bd4ef9b45d3749fa42a6f28081',
@@ -25,7 +24,7 @@ class _MyAppState extends State<MyApp> {
 
   List imagelist = [];
 
-  void loaddata() async{
+  void loaddata() async {
     await Future.delayed(Duration(milliseconds: 2000));
     imagelist.addAll(data);
     setState(() {});
@@ -36,6 +35,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     loaddata();
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,50 +45,49 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Center(
           child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            margin: EdgeInsets.only(left:10,right:10,top:10,bottom: 10),
-            child: Stack(
-              children: [
-                DragLike(
-                  child: imagelist.length <=0 ? Text('加载中...') : ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: TestDrag(src:imagelist[0])
-                  ), 
-                  secondChild: imagelist.length <= 1 ? Container(): ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child:TestDrag(src:imagelist[1])
-                  ), 
-                  screenWidth: 375, 
-                  outValue: 0.6,
-                  onChangeDragDistance: (distance){
-                    /// {distance: 0.17511112467447917, distanceProgress: 0.2918518744574653}
-                    print(distance.toString());
-                  },
-                  onOutComplete: (type){
-                    /// left or right
-                    print(type);
-                  },
-                  onScaleComplete: (){
-                    imagelist.remove(imagelist[0]);
-                    if(imagelist.length == 0) {
-                     loaddata();
-                    }
-                    setState(() {});
-                  },
-                  onPointerUp: (){
-                    
-                  },
-                ),
-              ],
-            )
-          ),
+              width: double.infinity,
+              height: double.infinity,
+              margin: EdgeInsets.only(left: 10, right: 10, top: 10, bottom: 10),
+              child: Stack(
+                children: [
+                  DragLike(
+                    child: imagelist.length <= 0
+                        ? Text('加载中...')
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: TestDrag(src: imagelist[0])),
+                    secondChild: imagelist.length <= 1
+                        ? Container()
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: TestDrag(src: imagelist[1])),
+                    screenWidth: 375,
+                    outValue: 0.4,
+                    dragSpeedRatio: 80,
+                    onChangeDragDistance: (distance) {
+                      /// {distance: 0.17511112467447917, distanceProgress: 0.2918518744574653}
+                      print(distance.toString());
+                    },
+                    onOutComplete: (type) {
+                      /// left or right
+                      print(type);
+                    },
+                    onScaleComplete: () {
+                      imagelist.remove(imagelist[0]);
+                      if (imagelist.length == 0) {
+                        loaddata();
+                      }
+                      setState(() {});
+                    },
+                    onPointerUp: () {},
+                  ),
+                ],
+              )),
         ),
       ),
     );
   }
 }
-
 
 class TestDrag extends StatelessWidget {
   final String src;
@@ -100,7 +99,10 @@ class TestDrag extends StatelessWidget {
       width: double.infinity,
       height: double.infinity,
       color: Colors.grey,
-      child: Image.network(src,fit: BoxFit.cover,),
+      child: Image.network(
+        src,
+        fit: BoxFit.cover,
+      ),
     );
   }
 }
