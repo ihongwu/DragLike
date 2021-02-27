@@ -66,19 +66,19 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
 
   // 更新偏移和缩放量
   void updatePosition(positionX) {
-    print("positionX = " + positionX.toString());
-    print("lastPositionX = " + lastPositionX.toString());
+    // print("positionX = " + positionX.toString());
+    // print("lastPositionX = " + lastPositionX.toString());
     double offset = positionX - onPressDx;
-    print("offset = " + offset.toString());
+    // print("offset = " + offset.toString());
 
     dragTime = DateTime.now();
 
     distanceBetweenTwo = positionX - lastPositionX;
-    print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
+    // print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
     lastPositionX = positionX;
 
     double offsetAbs = offset.abs();
-    print("offsetAbs = " + offsetAbs.toString());
+    // print("offsetAbs = " + offsetAbs.toString());
     double angleTemp =
         double.parse((offset / screenWidth / dragGvalue).toStringAsFixed(3));
     if (angle != angleTemp) {
@@ -86,7 +86,7 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
       secondScale = (offsetAbs / screenWidth / dragGvalue) / secondScaleSd;
       if (secondScale >= 0.1) secondScale = 0.1;
       dragDistance = offsetAbs / screenWidth;
-      print("dragDistance = " + dragDistance.toString());
+      // print("dragDistance = " + dragDistance.toString());
 
       if (offset < 0) {
         offsetX = -80;
@@ -94,14 +94,14 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
         offsetX = 80;
       }
 
-      // if (widget.onChangeDragDistance != null) {
-      //   double distance = offset / screenWidth;
-      //   double distanceProgress = distance / widget.outValue;
-      //   widget.onChangeDragDistance({
-      //     'distance': distance,
-      //     'distanceProgress': distanceProgress.abs(),
-      //   });
-      // }
+      if (widget.onChangeDragDistance != null) {
+        double distance = offset / screenWidth;
+        double distanceProgress = distance / widget.outValue;
+        widget.onChangeDragDistance({
+          'distance': distance,
+          'distanceProgress': distanceProgress.abs(),
+        });
+      }
       setState(() {});
     }
   }
@@ -187,7 +187,7 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
           onPointerDown: (value) {
             onPressDx = value.position.dx;
             lastPositionX = onPressDx;
-            print("--------------------------------");
+            // print("--------------------------------");
           },
           onPointerMove: (value) {
             updatePosition(value.position.dx);
@@ -195,25 +195,25 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
           onPointerUp: (value) async {
             int timeOffset = DateTime.now().difference(dragTime).inMicroseconds;
             //滑动速率 = 两个瞬间的距离 / 两个瞬间的时间差
-            print("timeOffset = " + timeOffset.toString());
+            // print("timeOffset = " + timeOffset.toString());
             if (timeOffset < 5000)
               timeOffset = 7500;
             else if (timeOffset < 8000) timeOffset = 10000;
             double dragSpeed = (distanceBetweenTwo / timeOffset * 1e5).abs();
 
-            print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
-            print("dragSpeed = " + dragSpeed.toString());
+            // print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
+            // print("dragSpeed = " + dragSpeed.toString());
             if (dragDistance > widget.outValue || dragSpeed >= widget.dragSpeedRatio) {
               if (dragDistance > widget.outValue) {
                 //以angle是否达到出界angle判断
                 runOutAnimate(1); 
-                print(offsetX > 0 ? 'right' : 'left');
-                print("type: outValue");
+                // print(offsetX > 0 ? 'right' : 'left');
+                // print("type: outValue");
               } else {
                 //以两个瞬间滑动的方向来判断
                 runOutAnimate(-1); 
-                print(distanceBetweenTwo > 0 ? 'right' : 'left');
-                print("type: speed direction");
+                // print(distanceBetweenTwo > 0 ? 'right' : 'left');
+                // print("type: speed direction");
               }
               runInScaleAnimate();
             } else {
