@@ -32,6 +32,7 @@ DragLike(
   ), 
   screenWidth: 375, 
   outValue: 0.6,
+  dragSpeedRatio: 80,
   onChangeDragDistance: (distance){
     /// {distance: 0.17511112467447917, distanceProgress: 0.2918518744574653}
     print(distance.toString());
