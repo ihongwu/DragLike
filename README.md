@@ -8,7 +8,6 @@
 
 # 注意事项
 1. 纯flutter实现，内部使用setState刷新布局，滑动widget不要过于复杂
-2. 目前为滑动到指定距离后，松手即可划出屏幕
 
 ### 安装
 在工程 pubspec.yaml 中加入 dependencies
