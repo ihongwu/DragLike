@@ -204,6 +204,9 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
             // print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
             // print("dragSpeed = " + dragSpeed.toString());
             if (dragDistance > widget.outValue || dragSpeed >= widget.dragSpeedRatio) {
+              if (widget.onOutComplete != null) {
+                  widget.onOutComplete(offsetX > 0 ? 'right' : 'left');
+              }
               if (dragDistance > widget.outValue) {
                 //以angle是否达到出界angle判断
                 runOutAnimate(1); 
