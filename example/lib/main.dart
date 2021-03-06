@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:drag_like/drag_like.dart';
 
@@ -91,7 +93,7 @@ class _MyAppState extends State<MyApp> {
 
 class TestDrag extends StatelessWidget {
   final String src;
-  const TestDrag({Key key, this.src}) : super(key: key);
+  const TestDrag({Key ? key,required this.src}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

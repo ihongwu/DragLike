@@ -1,10 +1,11 @@
-# drag_like 1.0.4
+# drag_like 1.0.5
 1. Flutter左滑右滑/喜欢、不喜欢的特效插件
 2. 支持划出事件回调，通知上层是左边划出还是右边划出
 3. 支持滑动进度回调
 4. 支持第二层widget缩放完成回调，缩放完成时刷新数据
 5. 支持手指抬起回调
 6. 支持手速检测，速度超过指定值后，卡片将会划出屏幕（感谢[@DoodleBears](https://github.com/DoodleBears)贡献代码）
+7. null safety
 
 # 注意事项
 1. 纯flutter实现，内部使用setState刷新布局，滑动widget不要过于复杂
