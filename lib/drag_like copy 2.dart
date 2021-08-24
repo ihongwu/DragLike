@@ -30,8 +30,6 @@ class DragLike extends StatefulWidget {
 }
 
 class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
-  List<PointerDownEvent> pointerDownEventList = [];
-  List<PointerMoveEvent> pointerMoveEvent = [];
   // 滑动不到指定位置返回时的动画
   Animation ? animation;
   // 第二个页面动画到前面
@@ -185,23 +183,18 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
                   child: child,
                 );
               },
-              child: Builder(builder: (BuildContext context) {
-                return widget.secondChild;
-              },),
+              child: widget.secondChild,
             ),
             Listener(
               onPointerDown: (value) {
-                pointerDownEventList.add(value);
-                onPressDx = pointerDownEventList[0].position.dx;
+                onPressDx = value.position.dx;
                 lastPositionX = onPressDx;
                 // print("--------------------------------");
               },
               onPointerMove: (value) {
-                pointerMoveEvent.add(value);
                 updatePosition(value.position.dx);
               },
               onPointerUp: (value) async {
-                pointerDownEventList.removeLast();
                 int timeOffset = DateTime.now().difference(dragTime).inMicroseconds;
                 //滑动速率 = 两个瞬间的距离 / 两个瞬间的时间差
                 // print("timeOffset = " + timeOffset.toString());
@@ -243,9 +236,7 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
                     child: child,
                   );
                 },
-                child: Builder(builder: (BuildContext context) {
-                  return widget.child;
-                },),
+                child: widget.child,
               ),
             )
         ],

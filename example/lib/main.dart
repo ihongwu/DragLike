@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:drag_like/drag_like.dart';
 
@@ -68,13 +66,14 @@ class _MyAppState extends State<MyApp> {
                     dragSpeedRatio: 80,
                     onChangeDragDistance: (distance) {
                       /// {distance: 0.17511112467447917, distanceProgress: 0.2918518744574653}
-                      print(distance.toString());
+                      // print(distance.toString());
                     },
                     onOutComplete: (type) {
                       /// left or right
-                      print(type);
+                      // print(type);
                     },
                     onScaleComplete: () {
+                      
                       imagelist.remove(imagelist[0]);
                       if (imagelist.length == 0) {
                         loaddata();
@@ -91,20 +90,54 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class TestDrag extends StatelessWidget {
+class TestDrag extends StatefulWidget {
   final String src;
   const TestDrag({Key ? key,required this.src}) : super(key: key);
 
+  @override
+  _TestDragState createState() => _TestDragState();
+}
+
+class _TestDragState extends State<TestDrag> {
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       height: double.infinity,
       color: Colors.grey,
-      child: Image.network(
-        src,
-        fit: BoxFit.cover,
+      child: Stack(
+        children: [
+          Positioned.fill(child: Image.network(
+            widget.src,
+            fit: BoxFit.cover,
+          )),
+          Text(widget.src)
+        ],
       ),
     );
   }
 }
+
+// class TestDrag extends StatelessWidget {
+//   final String src;
+//   const TestDrag({Key ? key,required this.src}) : super(key: key);
+
+//   @override
+//   Widget build(BuildContext context) {
+//     print(123333);
+//     return Container(
+//       width: double.infinity,
+//       height: double.infinity,
+//       color: Colors.grey,
+//       child: Stack(
+//         children: [
+//           Positioned.fill(child: Image.network(
+//             src,
+//             fit: BoxFit.cover,
+//           )),
+//           Text(src)
+//         ],
+//       ),
+//     );
+//   }
+// }

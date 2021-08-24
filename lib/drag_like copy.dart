@@ -30,8 +30,6 @@ class DragLike extends StatefulWidget {
 }
 
 class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
-  List<PointerDownEvent> pointerDownEventList = [];
-  List<PointerMoveEvent> pointerMoveEvent = [];
   // 滑动不到指定位置返回时的动画
   Animation ? animation;
   // 第二个页面动画到前面
@@ -43,8 +41,7 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
   // 屏幕宽度
   double get screenWidth => widget.screenWidth;
   // 旋转角度
-  // double angle = 0;
-  final ValueNotifier<double> angle = ValueNotifier(0);
+  double angle = 0;
   // 旋转时，x轴的偏移量
   double offsetX = 0;
   // 拖拽时，两个瞬间之间，x轴的差值
@@ -52,8 +49,7 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
   // 拖拽发生的时间
   DateTime dragTime = DateTime(0);
   // 第二层的缩放值，0-0.1，因为已设置初始值为0.9
-  // double secondScale = 0;
-  final ValueNotifier<double> secondScale = ValueNotifier(0);
+  double secondScale = 0;
   // 拖拽距离比0.0-1
   double dragDistance = 0;
   // 滑动流畅值，默认3.8，越小越快
@@ -83,10 +79,10 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
     // print("offsetAbs = " + offsetAbs.toString());
     double angleTemp =
         double.parse((offset / screenWidth / dragGvalue).toStringAsFixed(3));
-    if (angle.value != angleTemp) {
-      angle.value = angleTemp;
-      secondScale.value = (offsetAbs / screenWidth / dragGvalue) / secondScaleSd;
-      if (secondScale.value >= 0.1) secondScale.value = 0.1;
+    if (angle != angleTemp) {
+      angle = angleTemp;
+      secondScale = (offsetAbs / screenWidth / dragGvalue) / secondScaleSd;
+      if (secondScale >= 0.1) secondScale = 0.1;
       dragDistance = offsetAbs / screenWidth;
       // print("dragDistance = " + dragDistance.toString());
 
@@ -102,7 +98,7 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
         'distance': distance,
         'distanceProgress': distanceProgress.abs(),
       });
-      // setState(() {});
+      setState(() {});
     }
   }
 
@@ -111,17 +107,17 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
     AnimationController controller;
     controller = AnimationController(
         duration: const Duration(milliseconds: 250), vsync: this);
-    this.animation = Tween<double>(begin: angle.value, end: 0).animate(controller)
+    this.animation = Tween<double>(begin: angle, end: 0).animate(controller)
       ..addListener(() {
-        angle.value = this.animation!.value;
-        secondScale.value = angle.value.abs() / secondScaleSd;
-        if (secondScale.value <= 0) secondScale.value = 0;
+        angle = this.animation!.value;
+        secondScale = angle.abs() / secondScaleSd;
+        if (secondScale <= 0) secondScale = 0;
 
         dragDistance = 0;
         if (controller.isCompleted) {
           controller.dispose();
         }
-        // setState(() {});
+        setState(() {});
       });
     controller.forward(from: 0);
   }
@@ -132,18 +128,18 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
         duration: const Duration(milliseconds: 350), vsync: this);
     // direction: 判断卡片飞出方向的依据
     double direction = distanceBetweenTwo;
-    if (type == 1) direction = angle.value;
+    if (type == 1) direction = angle;
     this.animation =
-        Tween<double>(begin: angle.value, end: direction > 0 ? 0.5 : -0.5)
+        Tween<double>(begin: angle, end: direction > 0 ? 0.5 : -0.5)
             .animate(controller)
               ..addListener(() {
-                angle.value = this.animation!.value;
+                angle = this.animation!.value;
 
                 dragDistance = 0;
                 if (controller.isCompleted) {
                   controller.dispose();
                 }
-                // setState(() {});
+                setState(() {});
               });
     controller.forward(from: 0);
   }
@@ -153,16 +149,16 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
     controller = AnimationController(
         duration: const Duration(milliseconds: 350), vsync: this);
     this.scaleAnimation =
-        Tween<double>(begin: secondScale.value, end: 0.1).animate(controller)
+        Tween<double>(begin: secondScale, end: 0.1).animate(controller)
           ..addListener(() async {
-            secondScale.value = this.scaleAnimation!.value;
+            secondScale = this.scaleAnimation!.value;
             if (controller.isCompleted) {
               widget.onScaleComplete();
               controller.dispose();
               // 缩放完成以后，将上一层的widget还原到起始位置，不要动画，业务方需要将上层widget的数据替换
-              angle.value = 0;
+              angle = 0;
             }
-            // setState(() {});
+            setState(() {});
           });
     controller.forward(from: 0);
   }
@@ -176,80 +172,60 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Container(
         child: Stack(
-          children: [
-            ValueListenableBuilder(
-              valueListenable: secondScale,
-              builder: (BuildContext context,double value,Widget ? child){
-                return Transform.scale(
-                  scale: 0.9 + secondScale.value,
-                  child: child,
-                );
-              },
-              child: Builder(builder: (BuildContext context) {
-                return widget.secondChild;
-              },),
-            ),
-            Listener(
-              onPointerDown: (value) {
-                pointerDownEventList.add(value);
-                onPressDx = pointerDownEventList[0].position.dx;
-                lastPositionX = onPressDx;
-                // print("--------------------------------");
-              },
-              onPointerMove: (value) {
-                pointerMoveEvent.add(value);
-                updatePosition(value.position.dx);
-              },
-              onPointerUp: (value) async {
-                pointerDownEventList.removeLast();
-                int timeOffset = DateTime.now().difference(dragTime).inMicroseconds;
-                //滑动速率 = 两个瞬间的距离 / 两个瞬间的时间差
-                // print("timeOffset = " + timeOffset.toString());
-                if (timeOffset < 5000)
-                  timeOffset = 7500;
-                else if (timeOffset < 8000) timeOffset = 10000;
-                double dragSpeed = (distanceBetweenTwo / timeOffset * 1e5).abs();
+      children: [
+        Transform.scale(
+          scale: 0.9 + secondScale,
+          child: widget.secondChild,
+        ),
+        Listener(
+          onPointerDown: (value) {
+            onPressDx = value.position.dx;
+            lastPositionX = onPressDx;
+            // print("--------------------------------");
+          },
+          onPointerMove: (value) {
+            updatePosition(value.position.dx);
+          },
+          onPointerUp: (value) async {
+            int timeOffset = DateTime.now().difference(dragTime).inMicroseconds;
+            //滑动速率 = 两个瞬间的距离 / 两个瞬间的时间差
+            // print("timeOffset = " + timeOffset.toString());
+            if (timeOffset < 5000)
+              timeOffset = 7500;
+            else if (timeOffset < 8000) timeOffset = 10000;
+            double dragSpeed = (distanceBetweenTwo / timeOffset * 1e5).abs();
 
-                // print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
-                // print("dragSpeed = " + dragSpeed.toString());
-                if (dragDistance > widget.outValue || dragSpeed >= widget.dragSpeedRatio) {
-                    widget.onOutComplete(offsetX > 0 ? 'right' : 'left');
-                  if (dragDistance > widget.outValue) {
-                    //以angle是否达到出界angle判断
-                    runOutAnimate(1); 
-                    // print(offsetX > 0 ? 'right' : 'left');
-                    // print("type: outValue");
-                  } else {
-                    //以两个瞬间滑动的方向来判断
-                    runOutAnimate(-1); 
-                    // print(distanceBetweenTwo > 0 ? 'right' : 'left');
-                    // print("type: speed direction");
-                  }
-                  runInScaleAnimate();
-                } else {
-                  runBackAnimate();
-                }
-                // 手指抬起时，回调给上层
-                widget.onPointerUp();
-              },
-              child: ValueListenableBuilder(
-                valueListenable: angle,
-                builder: (BuildContext context,double value,Widget ? child){
-                  return Transform.rotate(
-                    angle: value,
-                    origin: Offset(value + offsetX, 1500),
-                    alignment:
-                        Alignment.lerp(Alignment.center, Alignment.bottomCenter, 1),
-                    child: child,
-                  );
-                },
-                child: Builder(builder: (BuildContext context) {
-                  return widget.child;
-                },),
-              ),
-            )
-        ],
-      )
-    );
+            // print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
+            // print("dragSpeed = " + dragSpeed.toString());
+            if (dragDistance > widget.outValue || dragSpeed >= widget.dragSpeedRatio) {
+                widget.onOutComplete(offsetX > 0 ? 'right' : 'left');
+              if (dragDistance > widget.outValue) {
+                //以angle是否达到出界angle判断
+                runOutAnimate(1); 
+                // print(offsetX > 0 ? 'right' : 'left');
+                // print("type: outValue");
+              } else {
+                //以两个瞬间滑动的方向来判断
+                runOutAnimate(-1); 
+                // print(distanceBetweenTwo > 0 ? 'right' : 'left');
+                // print("type: speed direction");
+              }
+              runInScaleAnimate();
+            } else {
+              runBackAnimate();
+            }
+            // 手指抬起时，回调给上层
+            widget.onPointerUp();
+          },
+          child: Transform.rotate(
+            angle: angle,
+            origin: Offset(angle + offsetX, 1500),
+            alignment:
+                Alignment.lerp(Alignment.center, Alignment.bottomCenter, 1),
+            child: widget.child,
+          ),
+        )
+      ],
+    ));
   }
 }
