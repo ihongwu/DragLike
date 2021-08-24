@@ -1,6 +1,6 @@
 name: drag_like
 description: Flutter左滑右滑/喜欢、不喜欢的特效插件
-version: 2.0.1
+version: 2.0.11
 homepage: https://github.com/ihongwu/DragLike
 
 environment:

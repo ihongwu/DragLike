@@ -7,9 +7,6 @@
 6. 支持手速检测，速度超过指定值后，卡片将会划出屏幕（感谢[@DoodleBears](https://github.com/DoodleBears)贡献代码）
 7. null safety
 
-# 注意事项
-1. 纯flutter实现，内部使用setState刷新布局，滑动widget不要过于复杂
-
 ### 安装
 在工程 pubspec.yaml 中加入 dependencies
 
