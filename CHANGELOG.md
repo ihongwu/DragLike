@@ -1,3 +1,7 @@
+## [2.0.12]
+
+* update readme
+
 ## [2.0.11]
 
 * update readme
