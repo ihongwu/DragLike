@@ -5,7 +5,7 @@ class DragLike extends StatefulWidget {
   final Widget secondChild;
   final double screenWidth;
   final double outValue;
-  final double dragSpeedRatio;
+  final double dragSpeed;
   final ValueChanged<String?> onOutComplete;
   final VoidCallback onScaleComplete;
   final ValueChanged<Map> onChangeDragDistance;
@@ -16,13 +16,13 @@ class DragLike extends StatefulWidget {
       required this.secondChild,
       required this.screenWidth,
       required this.outValue,
-      required this.dragSpeedRatio,
+      required this.dragSpeed,
       required this.onOutComplete,
       required this.onScaleComplete,
       required this.onChangeDragDistance,
       required this.onPointerUp})
       : assert(outValue <= 1 && outValue > 0),
-        assert(dragSpeedRatio > 0),
+        assert(dragSpeed > 0),
         super(key: key);
 
   @override
@@ -30,8 +30,6 @@ class DragLike extends StatefulWidget {
 }
 
 class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
-  List<PointerDownEvent> pointerDownEventList = [];
-  List<PointerMoveEvent> pointerMoveEvent = [];
   // 滑动不到指定位置返回时的动画
   Animation ? animation;
   // 第二个页面动画到前面
@@ -185,34 +183,19 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
                   child: child,
                 );
               },
-              child: Builder(builder: (BuildContext context) {
-                return widget.secondChild;
-              },),
+              child: widget.secondChild,
             ),
-            Listener(
-              onPointerDown: (value) {
-                pointerDownEventList.add(value);
-                onPressDx = pointerDownEventList[0].position.dx;
-                lastPositionX = onPressDx;
-                // print("--------------------------------");
+            GestureDetector(
+              onPanDown: (DragDownDetails value) {
+                lastPositionX = onPressDx = value.globalPosition.dx;
               },
-              onPointerMove: (value) {
-                pointerMoveEvent.add(value);
-                updatePosition(value.position.dx);
+              onHorizontalDragUpdate: (DragUpdateDetails value){
+                updatePosition(value.globalPosition.dx);
               },
-              onPointerUp: (value) async {
-                pointerDownEventList.removeLast();
-                int timeOffset = DateTime.now().difference(dragTime).inMicroseconds;
-                //滑动速率 = 两个瞬间的距离 / 两个瞬间的时间差
-                // print("timeOffset = " + timeOffset.toString());
-                if (timeOffset < 5000)
-                  timeOffset = 7500;
-                else if (timeOffset < 8000) timeOffset = 10000;
-                double dragSpeed = (distanceBetweenTwo / timeOffset * 1e5).abs();
-
-                // print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
-                // print("dragSpeed = " + dragSpeed.toString());
-                if (dragDistance > widget.outValue || dragSpeed >= widget.dragSpeedRatio) {
+              onHorizontalDragEnd: (DragEndDetails details){
+                // 滑动速度
+                var dragSpeed = details.velocity.pixelsPerSecond.dx.abs();
+                if (dragDistance > widget.outValue || dragSpeed >= widget.dragSpeed) {
                     widget.onOutComplete(offsetX > 0 ? 'right' : 'left');
                   if (dragDistance > widget.outValue) {
                     //以angle是否达到出界angle判断
@@ -231,6 +214,7 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
                 }
                 // 手指抬起时，回调给上层
                 widget.onPointerUp();
+
               },
               child: ValueListenableBuilder(
                 valueListenable: angle,
@@ -238,14 +222,11 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
                   return Transform.rotate(
                     angle: value,
                     origin: Offset(value + offsetX, 1500),
-                    alignment:
-                        Alignment.lerp(Alignment.center, Alignment.bottomCenter, 1),
+                    alignment: Alignment.lerp(Alignment.center, Alignment.bottomCenter, 1),
                     child: child,
                   );
                 },
-                child: Builder(builder: (BuildContext context) {
-                  return widget.child;
-                },),
+                child: widget.child,
               ),
             )
         ],

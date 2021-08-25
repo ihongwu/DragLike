@@ -62,15 +62,15 @@ class _MyAppState extends State<MyApp> {
                             borderRadius: BorderRadius.circular(10),
                             child: TestDrag(src: imagelist[1])),
                     screenWidth: 375,
-                    outValue: 0.4,
-                    dragSpeedRatio: 80,
+                    outValue: 1,
+                    dragSpeed: 1000,
                     onChangeDragDistance: (distance) {
                       /// {distance: 0.17511112467447917, distanceProgress: 0.2918518744574653}
                       // print(distance.toString());
                     },
                     onOutComplete: (type) {
                       /// left or right
-                      // print(type);
+                      print(type);
                     },
                     onScaleComplete: () {
                       
@@ -111,7 +111,7 @@ class _TestDragState extends State<TestDrag> {
             widget.src,
             fit: BoxFit.cover,
           )),
-          Text(widget.src)
+          // Text(widget.src)
         ],
       ),
     );
