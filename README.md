@@ -4,7 +4,7 @@
 3. 支持滑动进度回调
 4. 支持第二层widget缩放完成回调，缩放完成时刷新数据
 5. 支持手指抬起回调
-6. 支持手速检测，速度超过指定值后，卡片将会划出屏幕（感谢[@DoodleBears](https://github.com/DoodleBears)贡献代码）
+6. 支持手速检测，速度超过指定值后，卡片将会划出屏幕，已解决手速不准确问题（感谢[@DoodleBears](https://github.com/DoodleBears)贡献代码）
 7. null safety
 
 ### 安装
