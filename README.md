@@ -93,6 +93,15 @@ onPointerUp: (){
 },
 ```
 
+## 控制器
+```
+
+_dragController.toLeft();
+
+_dragController.toRight();
+
+```
+
 This project is a starting point for a Dart
 [package](https://flutter.dev/developing-packages/),
 a library module containing code that can be shared easily across
