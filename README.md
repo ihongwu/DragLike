@@ -22,6 +22,8 @@ dependencies:
 ## 使用方法
 ```
 DragLike(
+  dragController: _dragController,
+  duration: Duration(milliseconds: 520),
   child: imagelist.length <=0 ? Text('加载中...') : ClipRRect(
     borderRadius: BorderRadius.circular(10),
     child: TestDrag(src:imagelist[0])
