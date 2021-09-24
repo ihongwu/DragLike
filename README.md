@@ -6,6 +6,8 @@
 5. 支持手指抬起回调
 6. 支持手速检测，速度超过指定值后，卡片将会划出屏幕，已解决手速不准确问题（感谢[@DoodleBears](https://github.com/DoodleBears)贡献代码）
 7. null safety
+8. 支持控制控制左右划出
+9. 支持设置滑出动画执行时长
 
 ### 安装
 在工程 pubspec.yaml 中加入 dependencies
@@ -15,7 +17,7 @@ dependencies:
   drag_like: ^last version
 ```
 ## 效果图
-<img src="https://raw.githubusercontent.com/ihongwu/DragLike/main/drag_like.gif" width="400">
+<img src="https://user-images.githubusercontent.com/21274377/134722410-d38307ff-4506-47b2-9e40-ca64545a15f4.gif" width="400">
 
 ## 使用方法
 ```

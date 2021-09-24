@@ -6,10 +6,12 @@ class DragLike extends StatefulWidget {
   final double screenWidth;
   final double outValue;
   final double dragSpeed;
+  final Duration ? duration;
   final ValueChanged<String?> onOutComplete;
   final VoidCallback onScaleComplete;
   final ValueChanged<Map> onChangeDragDistance;
   final VoidCallback onPointerUp;
+  final DragController ? dragController;
   DragLike(
       {Key ? key,
       required this.child,
@@ -20,7 +22,9 @@ class DragLike extends StatefulWidget {
       required this.onOutComplete,
       required this.onScaleComplete,
       required this.onChangeDragDistance,
-      required this.onPointerUp})
+      required this.onPointerUp, 
+      this.dragController, 
+      this.duration})
       : assert(outValue <= 1 && outValue > 0),
         assert(dragSpeed > 0),
         super(key: key);
@@ -50,7 +54,6 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
   // 拖拽发生的时间
   DateTime dragTime = DateTime(0);
   // 第二层的缩放值，0-0.1，因为已设置初始值为0.9
-  // double secondScale = 0;
   final ValueNotifier<double> secondScale = ValueNotifier(0);
   // 拖拽距离比0.0-1
   double dragDistance = 0;
@@ -58,14 +61,17 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
   double dragGvalue = 5;
   // 第二层缩放速度，默认4，越小越快
   double secondScaleSd = 2.3;
+  // 动画是否执行完成，执行完成后，控制器执行滑动才有效
+  bool scaleComplete = true;
 
   @override
   void initState() {
     super.initState();
+    widget.dragController?.controlerInit(this);
   }
 
   // 更新偏移和缩放量
-  void updatePosition(positionX) {
+  void updatePosition(positionX,{iscontroller = false}) {
     // print("positionX = " + positionX.toString());
     // print("lastPositionX = " + lastPositionX.toString());
     double offset = positionX - onPressDx;
@@ -74,7 +80,6 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
     dragTime = DateTime.now();
 
     distanceBetweenTwo = positionX - lastPositionX;
-    // print("distanceBetweenTwo = " + distanceBetweenTwo.toString());
     lastPositionX = positionX;
 
     double offsetAbs = offset.abs();
@@ -96,11 +101,12 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
 
       double distance = offset / screenWidth;
       double distanceProgress = distance / widget.outValue;
-      widget.onChangeDragDistance({
-        'distance': distance,
-        'distanceProgress': distanceProgress.abs(),
-      });
-      // setState(() {});
+      if(!iscontroller) {
+        widget.onChangeDragDistance({
+          'distance': distance,
+          'distanceProgress': distanceProgress.abs(),
+        });
+      }
     }
   }
 
@@ -124,38 +130,44 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
     controller.forward(from: 0);
   }
 
-  void runOutAnimate(int type) {
+  void runOutAnimate(int type,{iscontroller = false}) {
+    scaleComplete = false;
+    // 回调给上层
+    widget.onOutComplete(type == 1 ? 'right' : 'left');
+
     AnimationController controller;
     controller = AnimationController(
-        duration: const Duration(milliseconds: 350), vsync: this);
-    // direction: 判断卡片飞出方向的依据
-    double direction = distanceBetweenTwo;
-    if (type == 1) direction = angle.value;
-    this.animation =
-        Tween<double>(begin: angle.value, end: direction > 0 ? 0.5 : -0.5)
-            .animate(controller)
-              ..addListener(() {
-                angle.value = this.animation!.value;
-
-                dragDistance = 0;
-                if (controller.isCompleted) {
-                  controller.dispose();
-                }
-                // setState(() {});
-              });
+        duration: widget.duration == null ? const Duration(milliseconds: 350) : widget.duration, vsync: this);
+    // 如果是控制器直接控制滑动，旋转角度直接从0开始
+    if(iscontroller) angle.value = 0;
+    this.animation = Tween<double>(begin: angle.value, end: type == 1 ? 0.5 : -0.5)
+      .animate(controller)
+        ..addListener(() {
+          angle.value = this.animation!.value;
+          dragDistance = 0;
+          if (controller.isCompleted) {
+            controller.dispose();
+          }
+          // setState(() {});
+        });
+    
     controller.forward(from: 0);
+    if(iscontroller) {
+      secondScale.value = 0.0;
+    }
   }
 
   void runInScaleAnimate() async {
     AnimationController controller;
     controller = AnimationController(
-        duration: const Duration(milliseconds: 350), vsync: this);
+        duration: widget.duration == null ? const Duration(milliseconds: 350) : widget.duration, vsync: this);
     this.scaleAnimation =
         Tween<double>(begin: secondScale.value, end: 0.1).animate(controller)
           ..addListener(() async {
             secondScale.value = this.scaleAnimation!.value;
             if (controller.isCompleted) {
               widget.onScaleComplete();
+              scaleComplete = true;
               controller.dispose();
               // 缩放完成以后，将上一层的widget还原到起始位置，不要动画，业务方需要将上层widget的数据替换
               angle.value = 0;
@@ -196,17 +208,13 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
                 // 滑动速度
                 var dragSpeed = details.velocity.pixelsPerSecond.dx.abs();
                 if (dragDistance > widget.outValue || dragSpeed >= widget.dragSpeed) {
-                    widget.onOutComplete(offsetX > 0 ? 'right' : 'left');
-                  if (dragDistance > widget.outValue) {
-                    //以angle是否达到出界angle判断
-                    runOutAnimate(1); 
-                    // print(offsetX > 0 ? 'right' : 'left');
-                    // print("type: outValue");
+
+                  if(distanceBetweenTwo > 0) {
+                    // right
+                    runOutAnimate(1);
                   } else {
-                    //以两个瞬间滑动的方向来判断
+                    // left
                     runOutAnimate(-1); 
-                    // print(distanceBetweenTwo > 0 ? 'right' : 'left');
-                    // print("type: speed direction");
                   }
                   runInScaleAnimate();
                 } else {
@@ -233,4 +241,29 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
       )
     );
   }
+}
+
+
+class DragController {
+  _DragLikeState ?  _widgetState;
+  void controlerInit(_DragLikeState _widgetState){
+    this._widgetState = _widgetState;
+  }
+
+  void toLeft() {
+    if(_widgetState!.scaleComplete) {
+      _widgetState!.updatePosition(0.0,iscontroller: true);
+      _widgetState!.runOutAnimate(-1,iscontroller: true);
+      _widgetState!.runInScaleAnimate();
+    }
+  }
+
+  void toRight() {
+    if(_widgetState!.scaleComplete) {
+      _widgetState!.updatePosition(0.0,iscontroller:true);
+      _widgetState!.runOutAnimate(1,iscontroller: true);
+      _widgetState!.runInScaleAnimate();
+    }
+  }
+
 }
