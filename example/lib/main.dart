@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
                             ),
                             child: Text('Left',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,fontSize: 30),),
                             onPressed: () async{
-                              if(imagelist.length > 0) _dragController.toLeft();
+                              if(imagelist.length > 0) _dragController.toLeft(completeTag: 'custom_left');
                             }
                           ),
 
@@ -136,7 +136,7 @@ class _MyAppState extends State<MyApp> {
                             ),
                             child: Text('right',style: TextStyle(color: Colors.white,fontWeight: FontWeight.w600,fontSize: 30),),
                             onPressed: () async{
-                              if(imagelist.length > 0) _dragController.toRight();
+                              if(imagelist.length > 0) _dragController.toRight(completeTag: 'custom_right');
                             }
                           ),
                         ],

@@ -130,10 +130,10 @@ class _DragLikeState extends State<DragLike> with TickerProviderStateMixin {
     controller.forward(from: 0);
   }
 
-  void runOutAnimate(int type,{iscontroller = false}) {
+  void runOutAnimate(int type,{iscontroller = false,String completeTag=''}) {
     scaleComplete = false;
     // 回调给上层
-    widget.onOutComplete(type == 1 ? 'right' : 'left');
+    widget.onOutComplete(type == 1 ? (completeTag == '' ? 'right' : completeTag) : (completeTag == '' ? 'left' : completeTag));
 
     AnimationController controller;
     controller = AnimationController(
@@ -250,18 +250,21 @@ class DragController {
     this._widgetState = _widgetState;
   }
 
-  void toLeft() {
+
+  // 通过控制器左滑出以后，默认回调给上层left，这里可以根据业务自定义把left修改为custom_left等等
+  void toLeft({String completeTag = ''}) {
     if(_widgetState!.scaleComplete) {
       _widgetState!.updatePosition(0.0,iscontroller: true);
-      _widgetState!.runOutAnimate(-1,iscontroller: true);
+      _widgetState!.runOutAnimate(-1,iscontroller: true,completeTag: completeTag);
       _widgetState!.runInScaleAnimate();
     }
   }
 
-  void toRight() {
+  // 通过控制器右滑出以后，默认回调给上层right，这里可以根据业务自定义把right修改为custom_right等等
+  void toRight({String completeTag = ''}) {
     if(_widgetState!.scaleComplete) {
       _widgetState!.updatePosition(0.0,iscontroller:true);
-      _widgetState!.runOutAnimate(1,iscontroller: true);
+      _widgetState!.runOutAnimate(1,iscontroller: true,completeTag:completeTag);
       _widgetState!.runInScaleAnimate();
     }
   }

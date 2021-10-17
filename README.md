@@ -8,6 +8,7 @@
 7. null safety
 8. 支持控制控制左右划出
 9. 支持设置滑出动画执行时长
+10. 支持控制器左右划出时，自定义回调参数
 
 ### 安装
 在工程 pubspec.yaml 中加入 dependencies
@@ -96,9 +97,9 @@ onPointerUp: (){
 ## 控制器
 ```
 
-_dragController.toLeft();
+_dragController.toLeft(completeTag: 'custom_left');
 
-_dragController.toRight();
+_dragController.toRight(completeTag: 'custom_right');
 
 ```
 
